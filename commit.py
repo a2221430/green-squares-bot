@@ -21,10 +21,10 @@ quotes = [
     "Build something you're proud of.",
     "Bit by bit, you create the masterpiece.",
     "The habit of showing up wins the game.",
-    "Don’t break the streak — commit today!",
+    "Don't break the streak — commit today!",
     "From bugs to brilliance — keep coding!",
-    "It’s not about perfection. It’s about progress.",
-    "You’re one step closer to your goal.",
+    "It's not about perfection. It's about progress.",
+    "You're one step closer to your goal.",
     "Keep calm and commit on.",
     "Even a tiny push moves the needle."
 ]
@@ -78,7 +78,7 @@ else:
 
 # Track weekly commit days
 def get_week_key(date):
-    return date.strftime("%Y-W%U")  # Year-WeekNumber (Monday as first day)
+    return date.strftime("%Y-W%W")  # Fixed: use %W so Monday is the first day of the week (was %U which uses Sunday)
 
 week_key = get_week_key(now)
 week_data = data.get("week_data", {})
@@ -86,59 +86,11 @@ week_commits = week_data.get(week_key, [])
 
 # Choose 4 random days (only once per week)
 if len(week_commits) == 0:
-    num_days = random.randint(3, 5)  # Commit 3 to 5 days each week
+    num_days = random.randint(4, 6)  # Bumped up slightly — I want more green squares :)
     week_commits = sorted(random.sample(range(7), num_days))
     week_data[week_key] = week_commits
     data["week_data"] = week_data
     with open(counter_file, "w") as f:
         json.dump(data, f)
 
-# ❌ Skip if today is not one of the selected commit days
-if weekday not in week_commits:
-    print(f"🛌 {now.strftime('%A')} not selected for this week. Skipping commits.")
-    exit()
-
-# Daily count
-done = data.get(date_key, 0)
-remaining = max_total - done
-if remaining <= 0:
-    print("✅ Max commits reached for today.")
-    exit()
-
-# Random number of commits
-slot_commit = random.randint(1, 5)
-slot_commit = min(slot_commit, remaining)
-
-# Ensure min_total is met
-if done + slot_commit < min_total and remaining <= 6:
-    slot_commit = min(min_total - done, remaining)
-
-log_entries = []
-
-# Do the commits
-for _ in range(slot_commit):
-    quote = random.choice(quotes)
-    message = random.choice(commit_messages)
-    filename = random.choice(target_files)
-
-    with open(filename, "a") as f:
-        f.write(f"[{timestamp}] {quote}\n")
-
-    subprocess.run(["git", "add", filename])
-    subprocess.run(["git", "commit", "-m", message])
-    log_entries.append(f"[{timestamp}] - {message}")
-
-# Update tracking
-data[date_key] = done + slot_commit
-data["week_data"] = week_data
-with open(counter_file, "w") as f:
-    json.dump(data, f)
-
-# Log
-if slot_commit > 0:
-    with open("commit_log.txt", "a") as log:
-        log.write(f"[{timestamp}] +{slot_commit} commit(s)\n")
-        log.write("\n".join(log_entries) + "\n\n")
-
-print(f"✅ {slot_commit} commit(s) made at {timestamp}. Total today: {done + slot_commit}")
-
+# ❌ Skip if today is not one of the selected commit d
