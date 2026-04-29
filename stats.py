@@ -109,30 +109,3 @@ def calculate_streak(daily_counts):
         prev_date = current_date
 
     return current_streak, longest_streak
-
-
-def print_stats():
-    """Print a summary of commit bot statistics to stdout."""
-    tracker = load_tracker()
-    total_from_log = count_commits_from_log()
-    daily_counts = parse_daily_log()
-    current_streak, longest_streak = calculate_streak(daily_counts)
-
-    total_days_active = sum(1 for v in daily_counts.values() if v > 0)
-    total_commits_daily = sum(daily_counts.values())
-
-    print("=" * 40)
-    print("   Green Squares Bot — Commit Stats")
-    print("=" * 40)
-    print(f"  Total commits (log):     {total_from_log}")
-    print(f"  Total commits (daily):   {total_commits_daily}")
-    print(f"  Days active:             {total_days_active}")
-    print(f"  Current streak:          {current_streak} day(s)")
-    print(f"  Longest streak:          {longest_streak} day(s)")
-    if tracker:
-        print(f"  Tracker entries:         {len(tracker)}")
-    print("=" * 40)
-
-
-if __name__ == "__main__":
-    print_stats()
